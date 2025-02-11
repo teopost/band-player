@@ -1,0 +1,14 @@
+app:
+  name: "Band player"                             # Nome dell'applicazione
+  custom_text: ""
+  custom_text_color: "black"                      # Colore del testo libero
+  # logo_url: "images/logo.png"                   # Percorso relativo del logo (commentato)
+  header_background_color: "blue"                 # Colore di sfondo della barra del titolo
+  header_text_color: "white"                      # Colore del testo del titolo
+
+  background_color: "white"                       # Colore di sfondo della pagina
+  list_background_color: "lightgray"              # Colore di sfondo della lista
+
+  footer_text: "Powered by Stefano Teodorani"     # Testo del footer
+  footer_text_color: "black"                      # Colore del testo del footer
+  footer_background_color: "white"                # Colore di sfondo del footer

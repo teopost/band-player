@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ config.name }}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: {{ config.background_color }};
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            background-color: {{ config.header_background_color }};
+            color: {{ config.header_text_color }};
+            padding: 15px;
+            text-align: center;
+        }
+        .app-title {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        .audio-list {
+            background-color: {{ config.list_background_color }};
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            flex: 1;
+        }
+        .footer {
+            background-color: {{ config.footer_background_color }};
+            color: {{ config.footer_text_color }};
+            text-align: center;
+            padding: 10px;
+            font-size: 0.8rem;
+        }
+        .folder-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .folder-buttons button {
+            margin: 5px;
+        }
+        .custom-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: {{ config.custom_text_color }};
+        }
+        .selected-folder {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra del titolo -->
+    <div class="header">
+        <h1 class="app-title">{{ config.name }}</h1>
+    </div>
+
+    <!-- Logo (solo se configurato) -->
+    {% if config.logo_url %}
+    <div class="text-center">
+        <img src="{{ url_for('static', filename=config.logo_url) }}" alt="Logo" class="img-fluid" style="max-width: 150px;">
+    </div>
+    {% endif %}
+
+    <!-- Testo libero sotto il logo -->
+    <div class="custom-text">
+        {{ config.custom_text }}
+    </div>
+
+    <!-- Pulsanti per le sottocartelle -->
+    <div class="folder-buttons">
+        {% for folder in subfolders %}
+        <button class="btn btn-primary" onclick="loadAudioFiles('{{ folder }}')">{{ folder }}</button>
+        {% endfor %}
+    </div>
+
+    <!-- Testo con la cartella selezionata -->
+    <div class="selected-folder" id="selected-folder">
+        Cartella selezionata: {{ subfolders[0] if subfolders else 'Nessuna cartella' }}
+    </div>
+
+    <!-- Lista degli audio -->
+    <div class="container">
+        <div class="audio-list" id="audio-list">
+            <ul class="list-group">
+                {% for file in audio_files %}
+                <li class="list-group-item">
+                    {{ file }}
+                    <audio controls class="float-right">
+                        <source src="{{ url_for('static', filename='audio/' + current_folder + '/' + file) }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        {{ config.footer_text }}
+    </div>
+
+    <!-- Bootstrap JS e dipendenze -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Script per gestire la riproduzione degli audio e il caricamento dei file -->
+<script>
+    // Funzione per caricare i file audio della sottocartella selezionata
+    function loadAudioFiles(folder) {
+        fetch(`/load-audio?folder=${folder}`)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('audio-list').innerHTML = data;
+                document.getElementById('selected-folder').innerText = `Cartella selezionata: ${folder}`;
+                attachAudioEventListeners();
+            });
+    }
+
+    // Funzione per gestire la riproduzione automatica del brano successivo
+    function handleAudioEnd() {
+        const audioElements = document.querySelectorAll('audio');
+        let currentAudioIndex = Array.from(audioElements).findIndex(audio => audio.ended);
+
+        if (currentAudioIndex !== -1 && currentAudioIndex < audioElements.length - 1) {
+            audioElements[currentAudioIndex + 1].play();
+        }
+    }
+
+    // Funzione per fermare tutti gli audio
+    function stopAllAudios() {
+        document.querySelectorAll('audio').forEach(audio => {
+            audio.pause();
+            audio.currentTime = 0;
+        });
+    }
+
+    // Funzione per attaccare i listener agli elementi audio
+    function attachAudioEventListeners() {
+        document.querySelectorAll('audio').forEach(audio => {
+            // Rimuovi i listener esistenti per evitare duplicati
+            audio.removeEventListener('play', stopOtherAudios);
+            audio.removeEventListener('ended', handleAudioEnd);
+
+            // Aggiungi i listener
+            audio.addEventListener('play', stopOtherAudios);
+            audio.addEventListener('ended', handleAudioEnd);
+        });
+    }
+
+    // Funzione per fermare gli altri audio quando ne viene avviato uno nuovo
+    function stopOtherAudios(event) {
+        document.querySelectorAll('audio').forEach(audio => {
+            if (audio !== event.target) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+        });
+    }
+
+    // Attacca i listener agli elementi audio al caricamento della pagina
+    document.addEventListener('DOMContentLoaded', attachAudioEventListeners);
+</script>
+
+</body>
+</html>

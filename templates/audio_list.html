@@ -1,0 +1,11 @@
+<ul class="list-group">
+    {% for file in audio_files %}
+    <li class="list-group-item">
+        {{ file }}
+        <audio controls class="float-right">
+            <source src="{{ url_for('static', filename='audio/' + current_folder + '/' + file) }}" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </li>
+    {% endfor %}
+</ul>
