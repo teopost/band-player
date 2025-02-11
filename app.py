@@ -23,8 +23,14 @@ def index():
 @app.route('/load-audio')
 def load_audio():
     folder = request.args.get('folder', '')
-    audio_files = get_audio_files(folder)
-    return render_template('audio_list.html', audio_files=audio_files, current_folder=folder)
+    audio_files = sorted([
+        f for f in os.listdir(os.path.join(AUDIO_FOLDER, folder)) 
+        if f.endswith(('.mp3', '.wav', '.ogg'))
+    ])
+    return render_template('audio_list.html', 
+        audio_files=audio_files, 
+        current_folder=folder
+    )
 
 def get_audio_files(folder):
     folder_path = os.path.join(AUDIO_FOLDER, folder)

@@ -3,7 +3,7 @@ app:
   custom_text: ""
   custom_text_color: "black"                      # Colore del testo libero
   # logo_url: "images/logo.png"                   # Percorso relativo del logo (commentato)
-  header_background_color: "blue"                 # Colore di sfondo della barra del titolo
+  header_background_color: "#22195c"              # Colore di sfondo della barra del titolo
   header_text_color: "white"                      # Colore del testo del titolo
 
   background_color: "white"                       # Colore di sfondo della pagina
@@ -12,3 +12,8 @@ app:
   footer_text: "Powered by Stefano Teodorani"     # Testo del footer
   footer_text_color: "black"                      # Colore del testo del footer
   footer_background_color: "white"                # Colore di sfondo del footer
+
+  playing_background_color: "#fff3cd"             # Colore di sfondo della riga selezionata
+  list_background_color: "#ffffff"                # GIALLO acceso per evidenziazione
+
+  active_button_color: "#22195c"                  # Colore pulsante attivo
