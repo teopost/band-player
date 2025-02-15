@@ -1,52 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config.name }}</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: {{ config.background_color }}; display: flex; flex-direction: column; min-height: 100vh; }
-        .header { background-color: {{ config.header_background_color }}; color: {{ config.header_text_color }}; padding: 15px; }
-        .audio-list { background-color: {{ config.list_background_color }}; border-radius: 5px; margin: 20px 0; }
-        .footer { background-color: {{ config.footer_background_color }}; color: {{ config.footer_text_color }}; padding: 10px; }
-
-        /* Sovrascrivi Bootstrap SENZA !important */
-        .list-group-item {
-            background-color: {{ config.list_background_color }};
-            transition: background-color 0.3s ease;
+        body { 
+            background-color: {{ config.background_color }}; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
         }
-        
-        /* Classe per evidenziazione con massima priorità */
-        .playing {
-            background-color: {{ config.playing_background_color }} !important;
+        .header { 
+            background-color: {{ config.header_background_color }}; 
+            color: {{ config.header_text_color }}; 
+            padding: 15px;
+            text-align: center;
         }
-
-        /* Classe per evidenziazione pulsante attivo */
+        .audio-list { 
+            background-color: {{ config.list_background_color }}; 
+            border-radius: 5px; 
+            margin: 20px 0; 
+        }
+        .footer { 
+            background-color: {{ config.footer_background_color }}; 
+            color: {{ config.footer_text_color }}; 
+            padding: 10px; 
+            text-align: center;
+        }
+        .list-group-item { 
+            transition: background-color 0.3s; 
+        }
+        .playing { 
+            background-color: {{ config.playing_background_color }} !important; 
+        }
         .btn-active {
             background-color: {{ config.active_button_color }} !important;
             border-color: {{ config.active_button_color }} !important;
             color: white !important;
         }
-
+        @media (max-width: 768px) {
+            .audio-controls { margin-top: 10px; }
+            .audio-file-name { text-align: center; }
+        }
     </style>
-
     <script type="text/javascript">
         window.appConfig = {
             listBgColor: "{{ config.list_background_color }}",
             playingBgColor: "{{ config.playing_background_color }}"
         };
     </script>
-
 </head>
 <body>
-    <div class="header text-center">
+    <div class="header">
         <h1>{{ config.name }}</h1>
         <p class="mb-0">{{ config.custom_text }}</p>
     </div>
 
     <div class="container">
-        
         <div class="folder-buttons text-center my-4">
             {% for folder in subfolders %}
             <button class="btn btn-secondary m-1 {% if folder == current_folder %}btn-active{% endif %}" 
@@ -61,22 +73,27 @@
         <div id="audio-list" class="audio-list">
             <ul class="list-group">
                 {% for file in audio_files %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    {{ file }}
-                    <audio controls class="ml-3">
-                        <source src="{{ url_for('static', filename='audio/' + current_folder + '/' + file) }}" type="audio/mpeg">
-                    </audio>
+                <li class="list-group-item">
+                    <div class="row align-items-center">
+                        <div class="col-12 col-md-8 mb-2 mb-md-0 audio-file-name">
+                            {{ file }}
+                        </div>
+                        <div class="col-12 col-md-4 audio-controls">
+                            <audio controls class="w-100">
+                                <source src="{{ url_for('static', filename='audio/' + current_folder + '/' + file) }}" type="audio/mpeg">
+                            </audio>
+                        </div>
+                    </div>
                 </li>
                 {% endfor %}
             </ul>
         </div>
     </div>
 
-    <div class="footer text-center mt-auto">
+    <div class="footer mt-auto">
         <small>{{ config.footer_text }}</small>
     </div>
 
     <script src="{{ url_for('static', filename='js/audio-player.js') }}"></script>
-    
 </body>
 </html>

@@ -1,16 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
     let currentHighlightedItem = null;
-    let currentFolder = '';
+    let currentFolder = document.querySelector('.btn-active')?.dataset.folder || '';
 
     const updateAudioList = (folder) => {
         fetch(`/load-audio?folder=${encodeURIComponent(folder)}`)
             .then(response => response.text())
             .then(html => {
-                document.getElementById('audio-list').innerHTML = html;
-                document.getElementById('selected-folder').textContent = `Cartella corrente: ${folder}`;
-                currentFolder = folder;
-                attachAudioHandlers();
-            });
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.getElementById('audio-list');
+                
+                if (newContent) {
+                    document.getElementById('audio-list').innerHTML = newContent.innerHTML;
+                    document.getElementById('selected-folder').textContent = `Cartella selezionata: ${folder}`;
+                    currentFolder = folder;
+                    attachAudioHandlers();
+                }
+            })
+            .catch(error => console.error('Error:', error));
     };
 
     const handlePlay = (e) => {
@@ -49,15 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', (e) => {
             const newFolder = e.target.dataset.folder;
             if(newFolder !== currentFolder) {
-                // Rimuovi la classe 'btn-active' da tutti i pulsanti
                 document.querySelectorAll('[data-folder]').forEach(btn => {
                     btn.classList.remove('btn-active');
                 });
-                
-                // Aggiungi la classe al pulsante cliccato
                 e.target.classList.add('btn-active');
                 
-                // Aggiorna la lista
                 if(currentHighlightedItem) {
                     currentHighlightedItem.classList.remove('playing');
                 }
@@ -66,9 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Inizializza il pulsante attivo all'avvio
-    document.querySelector('[data-folder].btn-active')?.classList.add('btn-active');
-
     // Inizializzazione
     attachAudioHandlers();
+    document.getElementById('selected-folder').textContent = `Cartella selezionata: ${currentFolder}`;
 });
