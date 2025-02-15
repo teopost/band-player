@@ -15,6 +15,9 @@ WORKDIR /app
 # Copia i file di dipendenze
 COPY requirements.txt .
 
+# Copia le icone dell'applicazione
+COPY static/images /app/static/images
+
 # Installa le dipendenze
 RUN pip install --no-cache-dir -r requirements.txt
 

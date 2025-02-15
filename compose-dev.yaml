@@ -1,0 +1,13 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        UID: 1000
+        GID: 1000
+    ports:
+      - "5099:5015"
+    volumes:
+      - ./static:/app/static  # Monta la cartella static locale nel container
+    environment:
+      - FLASK_DEBUG=True
