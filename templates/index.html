@@ -4,43 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config.name }}</title>
-
-    <!-- Favicon standard -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
-
-    <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
-
-    <!-- Web Manifest -->
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}">
-
-    
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { 
             background-color: {{ config.background_color }}; 
             display: flex; 
             flex-direction: column; 
             min-height: 100vh; 
+            padding-top: 0px;
         }
-        .header { 
-            background-color: {{ config.header_background_color }}; 
-            color: {{ config.header_text_color }}; 
+        .header-container {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: {{ config.header_background_color }};
+            transition: transform 0.3s ease;
+            transform: translateY(0);
+        }
+        .header {
             padding: 15px;
             text-align: center;
+        }
+        .app-title {
+            color: {{ config.header_text_color }} !important;
+            font-size: 2rem;
+            margin: 0;
+            padding: 10px 0;
+        }
+        .folder-buttons-container {
+            position: sticky;
+            top: 60px;
+            width: 100%;
+            background: {{ config.background_color }};
+            z-index: 999;
+            border-bottom: 1px solid #dee2e6;
+            padding: 5px 0;
+            transition: top 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .scrolled .folder-buttons-container {
+            top: 0;
+        }
+        .main-content {
+            flex: 1;
+            padding: 15px 0;
         }
         .audio-list { 
             background-color: {{ config.list_background_color }}; 
             border-radius: 5px; 
-            margin: 20px 0; 
         }
         .footer { 
             background-color: {{ config.footer_background_color }}; 
             color: {{ config.footer_text_color }}; 
             padding: 10px; 
             text-align: center;
+            margin-top: auto;
         }
         .list-group-item { 
             transition: background-color 0.3s; 
@@ -53,7 +77,15 @@
             border-color: {{ config.active_button_color }} !important;
             color: white !important;
         }
+        #selected-folder {
+            font-size: 0.9rem;
+            padding: 2px 0;
+            color: gray;
+        }
         @media (max-width: 768px) {
+            body { padding-top: 70px; }
+            .folder-buttons-container { top: 50px; }
+            .app-title { font-size: 1.5rem; }
             .audio-controls { margin-top: 10px; }
             .audio-file-name { text-align: center; }
         }
@@ -66,23 +98,27 @@
     </script>
 </head>
 <body>
-    <div class="header">
-        <h1>{{ config.name }}</h1>
-        <p class="mb-0">{{ config.custom_text }}</p>
+    <div class="header-container">
+        <div class="header">
+            <h1 class="app-title">{{ config.name }}</h1>
+        </div>
     </div>
 
-    <div class="container">
-        <div class="folder-buttons text-center my-4">
-            {% for folder in subfolders %}
-            <button class="btn btn-secondary m-1 {% if folder == current_folder %}btn-active{% endif %}" 
-                    data-folder="{{ folder }}">
-                {{ folder }}
-            </button>
-            {% endfor %}
+    <div class="folder-buttons-container">
+        <div class="container">
+            <div class="folder-buttons text-center">
+                {% for folder in subfolders %}
+                <button class="btn btn-sm btn-secondary m-1 {% if folder == current_folder %}btn-active{% endif %}" 
+                        data-folder="{{ folder }}">
+                    {{ folder }}
+                </button>
+                {% endfor %}
+            </div>
+            <div id="selected-folder" class="text-center"></div>
         </div>
+    </div>
 
-        <div id="selected-folder" class="text-muted text-center mb-3"></div>
-
+    <div class="main-content container">
         <div id="audio-list" class="audio-list">
             <ul class="list-group">
                 {% for file in audio_files %}
@@ -103,7 +139,7 @@
         </div>
     </div>
 
-    <div class="footer mt-auto">
+    <div class="footer">
         <small>{{ config.footer_text }}</small>
     </div>
 

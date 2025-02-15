@@ -1,6 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
     let currentHighlightedItem = null;
     let currentFolder = document.querySelector('.btn-active')?.dataset.folder || '';
+    let lastScroll = 0;
+    const header = document.querySelector('.header-container');
+    const buttonsContainer = document.querySelector('.folder-buttons-container');
+
+    window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+        
+        if (currentScroll > 100 && currentScroll > lastScroll) {
+            header.style.transform = `translateY(-${header.offsetHeight}px)`;
+            buttonsContainer.style.top = "0";
+            document.body.classList.add('scrolled');
+        } else {
+            header.style.transform = "translateY(0)";
+            buttonsContainer.style.top = `${header.offsetHeight}px`;
+            document.body.classList.remove('scrolled');
+        }
+        lastScroll = currentScroll;
+    });
 
     const updateAudioList = (folder) => {
         fetch(`/load-audio?folder=${encodeURIComponent(folder)}`)
@@ -21,10 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handlePlay = (e) => {
-        if(currentHighlightedItem) {
-            currentHighlightedItem.classList.remove('playing');
-        }
-        
+        if(currentHighlightedItem) currentHighlightedItem.classList.remove('playing');
         currentHighlightedItem = e.target.closest('.list-group-item');
         currentHighlightedItem.classList.add('playing');
     };
@@ -32,15 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleEnded = (e) => {
         const currentItem = e.target.closest('.list-group-item');
         const nextAudio = currentItem.nextElementSibling?.querySelector('audio');
-
-        if(nextAudio) {
-            currentItem.classList.remove('playing');
-            const nextItem = nextAudio.closest('.list-group-item');
-            nextItem.classList.add('playing');
-            nextAudio.play();
-        } else {
-            currentItem.classList.remove('playing');
-        }
+        nextAudio ? nextAudio.play() : currentItem.classList.remove('playing');
     };
 
     const attachAudioHandlers = () => {
@@ -56,14 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', (e) => {
             const newFolder = e.target.dataset.folder;
             if(newFolder !== currentFolder) {
-                document.querySelectorAll('[data-folder]').forEach(btn => {
-                    btn.classList.remove('btn-active');
-                });
+                document.querySelectorAll('[data-folder]').forEach(btn => btn.classList.remove('btn-active'));
                 e.target.classList.add('btn-active');
-                
-                if(currentHighlightedItem) {
-                    currentHighlightedItem.classList.remove('playing');
-                }
+                if(currentHighlightedItem) currentHighlightedItem.classList.remove('playing');
                 updateAudioList(newFolder);
             }
         });
@@ -72,4 +74,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inizializzazione
     attachAudioHandlers();
     document.getElementById('selected-folder').textContent = `Cartella selezionata: ${currentFolder}`;
+    buttonsContainer.style.top = `${header.offsetHeight}px`;
 });
