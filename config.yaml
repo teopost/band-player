@@ -1,5 +1,5 @@
 app:
-  name: "Band player"                             # Nome dell'applicazione
+  name: "Band Music Player"                       # Nome dell'applicazione
   custom_text: ""
   custom_text_color: "black"                      # Colore del testo libero
   # logo_url: "images/logo.png"                   # Percorso relativo del logo (commentato)
